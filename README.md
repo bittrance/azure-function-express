@@ -90,6 +90,20 @@ app.get("/api/hello-world", (req, res) => {
 });
 ```
 
+## Logging
+
+This package also provides a simple logging middleware that makes use of `context.log`. Install it like so:
+
+```js
+const app = express();
+app.get("/", (req, res) => { /* ... */ });
+// Add logging middleware after routes
+app.use(createErrorLogger());
+app.use(createRequestLogger());
+module.exports = createHandler(app);
+```
+
+This will cause Azure Functions to output your logs to Azure Monitor.
 
 ## Runtime compatibility
 

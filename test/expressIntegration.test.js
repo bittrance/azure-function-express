@@ -1,5 +1,10 @@
 import express from "express";
-import { createAzureFunctionHandler } from "../src";
+import { res } from "pino-std-serializers";
+import {
+  createErrorLogger,
+  createRequestLogger,
+  createAzureFunctionHandler,
+} from "../src";
 
 describe("express integration", () => {
 
@@ -74,4 +79,62 @@ describe("express integration", () => {
     handle(context, context.req);
   });
 
+  describe("looking at logging", () => {
+    const messages = [];
+    const errors = [];
+    const context = {
+      bindings: {
+        req: { method: "GET", originalUrl: "https://lol.com/" },
+      },
+      log: {
+        error: (message) => errors.push(message),
+        info: (message) => messages.push(message),
+      },
+    };
+
+    beforeEach(() => {
+      messages.length = 0;
+      errors.length = 0;
+    });
+
+    it("logs errors as described in README", (done) => {
+      context.done = (_err) => {
+        expect(messages).toEqual([]);
+        expect(errors).toEqual([expect.stringMatching(/boom!/)]);
+        done();
+      };
+
+      const app = express();
+      app.get("/", (_req, _res, next) => {
+        next(new Error("boom!"));
+      });
+      app.use(createErrorLogger());
+      app.use(createRequestLogger());
+      const handle = createAzureFunctionHandler(app);
+      handle(context, context.req);
+    });
+
+    it("logs requests as described in README", (done) => {
+      context.done = (_err) => {
+        // context.done() is called as part of send, i.e. before logging.
+        // This may in fact be a defect: the runtime may well be evicted
+        // immediately on calling done().
+        setTimeout(() => {
+          expect(messages).toEqual([expect.stringMatching(/statusCode.*200/)]);
+          expect(errors).toEqual([]);
+          done();
+        }, 100);
+      };
+
+      const app = express();
+      app.get("/", (_req, res, next) => {
+        res.send("hello");
+        next();
+      });
+      app.use(createErrorLogger());
+      app.use(createRequestLogger());
+      const handle = createAzureFunctionHandler(app);
+      handle(context, context.req);
+    });
+  });
 });

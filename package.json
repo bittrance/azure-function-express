@@ -64,5 +64,8 @@
     "eslint-plugin-import": "^2.14.0",
     "express": "^4.16.3",
     "jest": "^25.5.0"
+  },
+  "dependencies": {
+    "pino-std-serializers": "^5.2.0"
   }
 }
