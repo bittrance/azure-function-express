@@ -20,6 +20,9 @@ export function createRequestLogger() {
   return (req, res, next) => {
     const reqEntry = stripSymbolEntries(serializers.req(req));
     const resEntry = stripSymbolEntries(serializers.res(res));
+    if (res.cause !== undefined) {
+      resEntry.cause = serializers.err(res.cause);
+    }
     req.context.log.info(JSON.stringify({ req: reqEntry, res: resEntry }));
     next();
   };

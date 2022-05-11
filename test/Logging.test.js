@@ -30,6 +30,12 @@ describe("createRequestLogger", () => {
     expect(messages).not.toEqual([expect.stringMatching(/extra/)]);
   });
 
+  it("logs the cause, if any", () => {
+    res.cause = new Error("boom!");
+    logger(req, res, () => {});
+    expect(messages).toEqual([expect.stringMatching(/message.*boom!/)]);
+  });
+
   it("calls next", (done) => {
     logger(req, res, done);
   });

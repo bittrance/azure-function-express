@@ -105,6 +105,19 @@ module.exports = createHandler(app);
 
 This will cause Azure Functions to output your logs to Azure Monitor.
 
+If you decide to introduce a middleware that recovers from an error condition, for example by converting a validation error into a HTTP status code 422 response, you may want to retain the exception in your request logging for analysis. You can do this by setting `res.cause` which will be included in the request log. For example:
+
+```js
+app.use((err, req, res, next) => {
+  if (err.type == "validation") {
+    res.sendStatus(422);
+    res.cause = err;
+    next(); // Recover
+  }
+  next(err);
+});
+```
+
 ## Runtime compatibility
 
 Supported Node version are Node 8 through to 16.

@@ -121,6 +121,7 @@ describe("express integration", () => {
         // immediately on calling done().
         setTimeout(() => {
           expect(messages).toEqual([expect.stringMatching(/statusCode.*200/)]);
+          expect(messages).toEqual([expect.stringMatching(/ze-cause/)]);
           expect(errors).toEqual([]);
           done();
         }, 100);
@@ -129,6 +130,7 @@ describe("express integration", () => {
       const app = express();
       app.get("/", (_req, res, next) => {
         res.send("hello");
+        res.cause = new Error("ze-cause")
         next();
       });
       app.use(createErrorLogger());
