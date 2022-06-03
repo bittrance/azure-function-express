@@ -1,0 +1,14 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "Testo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bittrance/azure-function-express": "file:/home/bittrance/projects/personal/azure-function-express"
+  }
+}
